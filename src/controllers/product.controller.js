@@ -1,36 +1,61 @@
+import Product from "../models/product";
 const products = [
   { id: 1, name: "Product", price: 222 },
   { id: 2, name: "Product 2", price: 11222 },
   { id: 3, name: "Product 2", price: 300 },
 ];
 // [GET] all product
-const getAll = (req, res) => {
-  res.send(res.json(products));
+const getAll = async (req, res) => {
+  try {
+    const product = await Product.find();
+    res.status(200).json({
+      data: product,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 // [GET] product by id
-const getProductById = (req, res) => {
-  const product = products.find((prod) => prod.id === parseInt(req.params.id));
-  res.send(res.json(product));
+const getProductById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const product = await Product.findOne({ _id: id });
+    res.status(200).json({
+      data: product,
+    });
+  } catch (error) {}
 };
 // [PUT] update product
 const update = (req, res) => {
-  const id = parseInt(req.params.id);
-  const data = req.body;
-  const newProduct = products.map((prod) => {
-    return prod.id === id ? data : prod;
+ try {
+    const id = req.params.id
+    const body = req.body
+    const product = Product.findOneAndUpdate({_id:id})
+ } catch (error) {
+  res.status(400).json({
+    messsage: "Không update được sản phẩm",
   });
-  res.send(res.json(newProduct));
+ }
 };
 // [POST] add new product
-const add = (req, res) => {
-  const data = req.body;
-  products.push(data);
-  res.send(res.json(products));
+const add = async (req, res) => {
+  const body = req.body;
+  try {
+    const product = await new Product(body).save();
+    res.status(200).json({
+      data: product,
+      message: "thêm thành công",
+    });
+  } catch (error) {
+    res.status(400).json({
+      messsage: "Không thêm được sản phẩm",
+    });
+  }
 };
 // [DELETE] add new product
 const remove = (req, res) => {
   const id = parseInt(req.params.id);
- const newProduct= products.filter(prod=>prod.id!==id)
+  const newProduct = products.filter((prod) => prod.id !== id);
   res.send(res.json(newProduct));
 };
-export { getAll, update, add, getProductById,remove };
+export { getAll, update, add, getProductById, remove };
