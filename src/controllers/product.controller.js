@@ -27,15 +27,15 @@ const getProductById = async (req, res) => {
 };
 // [PUT] update product
 const update = (req, res) => {
- try {
-    const id = req.params.id
-    const body = req.body
-    const product = Product.findOneAndUpdate({_id:id})
- } catch (error) {
-  res.status(400).json({
-    messsage: "Không update được sản phẩm",
-  });
- }
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    const product = Product.findOneAndUpdate({ _id: id });
+  } catch (error) {
+    res.status(400).json({
+      messsage: "Không update được sản phẩm",
+    });
+  }
 };
 // [POST] add new product
 const add = async (req, res) => {
@@ -54,8 +54,12 @@ const add = async (req, res) => {
 };
 // [DELETE] add new product
 const remove = (req, res) => {
-  const id = parseInt(req.params.id);
-  const newProduct = products.filter((prod) => prod.id !== id);
-  res.send(res.json(newProduct));
+  try {
+    const id = parseInt(req.params.id);
+    const product = Product.deleteOne({ _id: id });
+    res.status(200).json({ messsage: "Xóa thành công", product });
+  } catch (error) {
+    res.status(400).json({ messsage: "Xóa không thành công" });
+  }
 };
 export { getAll, update, add, getProductById, remove };

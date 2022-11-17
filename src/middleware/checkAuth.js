@@ -1,15 +1,23 @@
-const users = [
-  { password: "123", name: "Product", id: 1, role: 1 },
-  { password: "123", name: "Product 2", id: 2, role: 2 },
-];
-
-const checkAuth = (req, res, next) => {
-  const userInfo = req.body;
-  const user = users.find(
-    (user) => user.name === userInfo.name && user.password === userInfo.password
-  );
-  if (!user) {
-    res.status(404).json({ message: "User not found" });
+import jwt from "jsonwebtoken";
+import AuthSchema from "../models/auth";
+const checkAuth = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    const product = await AuthSchema.findOne({ username, password });
+    if (!product) {
+      res
+        .status(400)
+        .json({ message: "username or password not found", product });
+      return;
+    }
+    const token = await jwt.sign(
+      { username: product.username, password: product.password },
+      "keyyy"
+    );
+    res.status(200).json({ message: "Login success", token });
+  } catch (error) {
+    res.status(400).json({ message: "Login failed", error });
+    return;
   }
   next();
 };
